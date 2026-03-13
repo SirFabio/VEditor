@@ -1,7 +1,7 @@
 
 # VEditor
 
-VEditor is plugin for MantisBT using TinyMCE as  bugnote editor.
+VEditor is plugin for MantisBT using TinyMCE as bugnote editor.
 This allows you to paste screensots and use html code, e.g. bold text, colors or tables. It replace default textarea in bug reporting.  This plugin replace standard MantisCoreFormatting.
 
 
@@ -15,7 +15,7 @@ This allows you to paste screensots and use html code, e.g. bold text, colors or
 - Support for Light/dark mode
 - Multi-language support
 
-This plugin requires MantisBT 2.1.0. It was tested on 2.26.1, PHP 8.3.X 
+This plugin requires MantisBT 2.23.0. It was tested on 2.26.1-2.28.0, PHP 8.3.X 
 
 ## Installation
 
@@ -36,7 +36,7 @@ $g_custom_headers = array( 'Content-Security-Policy: ' . "default-src *; img-src
 
 ### Update bug_api.php
 If you want to save images as bug attachments (recommended) you should patch MantisBT code.
-It is required for hide files generated from TinyMCE.
+It is required for hide attachments generated from TinyMCE.
 Open core/bug_api.php file and find bug_get_attachments function.  
 Add marked lines at the beginning code (around 1900 line code)
 

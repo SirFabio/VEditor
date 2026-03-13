@@ -14,17 +14,33 @@ require_once('htmLawed/htmLawed.php');
 define("IMG_PREFIX", 'Pasted by TinyMCE');
 
 class VEditorPlugin extends MantisFormattingPlugin {
-
+    
+    const int MIN_TEXT_AREA_SIZE = 1048576;
+    
     function register() {
         $this->name = 'VEditor';
         $this->description = 'TinyMCE extension - wyswig editor for textarea (replace MantisCoreFormatting)';
-        $this->version = '1.1.0';
-        $this->requires = array('MantisCore' => '2.1.0',);
+        $this->version = '1.1.1';
+        $this->requires = array('MantisCore' => '2.23.0',);
         $this->author = 'Ryszard Pydo';
         $this->contact = 'pysiek634 on github.com';
         $this->url = 'https://github.com/pysiek634/VEditor.git';
     }
 
+    #[\Override]    
+    public function init() {
+        global $g_max_textarea_length;
+/*
+ * Extend max_text_area_size which is too low for images
+ * default limit is 64 KB (2.27.2)
+ * VEditor extends it to 1 MB
+ */        
+        if (isset($g_max_textarea_length) and $g_max_textarea_length < self::MIN_TEXT_AREA_SIZE) {
+            $g_max_textarea_length = self::MIN_TEXT_AREA_SIZE;
+        }
+        return true;
+    }
+    
     /**
      * Event hook declaration.
      * @return array
@@ -98,7 +114,7 @@ class VEditorPlugin extends MantisFormattingPlugin {
     }
 
     private function update_custom_notes($p_bug_id) {
-        $t_query = 'SELECT * FROM {custom_field_string} WHERE `bug_id` = ' . db_param() . ' and text is NOT NULL';
+        $t_query = 'SELECT * FROM {custom_field_string} WHERE bug_id = ' . db_param() . ' and text is NOT NULL';
         $rs = db_query($t_query, array($p_bug_id));
 
         while ($row = db_fetch_array($rs)) {
