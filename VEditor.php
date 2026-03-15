@@ -20,7 +20,7 @@ class VEditorPlugin extends MantisFormattingPlugin {
     function register() {
         $this->name = 'VEditor';
         $this->description = 'TinyMCE extension - wyswig editor for textarea (replace MantisCoreFormatting)';
-        $this->version = '1.1.1';
+        $this->version = '1.1.2';
         $this->requires = array('MantisCore' => '2.23.0',);
         $this->author = 'Ryszard Pydo';
         $this->contact = 'pysiek634 on github.com';
@@ -334,7 +334,6 @@ class VEditorPlugin extends MantisFormattingPlugin {
         if ($p_multiline) {
             $config = array('safe' => 1, 'schemes' => '*:*; src:http, https, data');
             $out_str = htmLawed($p_string, $config);
-            $out_str = $p_string;
             return $out_str;
         }
         $t_string = string_html_specialchars($t_string, ENT_NOQUOTES);
