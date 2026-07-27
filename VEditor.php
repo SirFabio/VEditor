@@ -1,6 +1,6 @@
 <?php
 #******************************************************************************
-# VEditor is plugin for MantisBT using TinyMCE extension 
+# VEditor is plugin for MantisBT using TinyMCE extension
 # Copyright Ryszard Pydo
 #
 # Licensed under MIT licence
@@ -14,9 +14,9 @@ require_once('htmLawed/htmLawed.php');
 define("IMG_PREFIX", 'Pasted by TinyMCE');
 
 class VEditorPlugin extends MantisFormattingPlugin {
-    
+
     const int MIN_TEXT_AREA_SIZE = 1048576;
-    
+
     function register() {
         $this->name = 'VEditor';
         $this->description = 'TinyMCE extension - wyswig editor for textarea (replace MantisCoreFormatting)';
@@ -25,22 +25,23 @@ class VEditorPlugin extends MantisFormattingPlugin {
         $this->author = 'Ryszard Pydo';
         $this->contact = 'pysiek634 on github.com';
         $this->url = 'https://github.com/pysiek634/VEditor.git';
+        $this->page = 'config_page';
     }
 
-    #[\Override]    
+    #[\Override]
     public function init() {
         global $g_max_textarea_length;
 /*
  * Extend max_text_area_size which is too low for images
  * default limit is 64 KB (2.27.2)
  * VEditor extends it to 1 MB
- */        
+ */
         if (isset($g_max_textarea_length) and $g_max_textarea_length < self::MIN_TEXT_AREA_SIZE) {
             $g_max_textarea_length = self::MIN_TEXT_AREA_SIZE;
         }
         return true;
     }
-    
+
     /**
      * Event hook declaration.
      * @return array
@@ -240,6 +241,11 @@ class VEditorPlugin extends MantisFormattingPlugin {
             return;
         }
         $t_config = $this->tinyMCE_config();
+
+        $t_show_menubar = plugin_config_get( 'show_menubar', true );
+
+        $t_config['menubar'] = $t_show_menubar ? plugin_config_get( 'menubar', '' ) : '';
+
         echo '<wyswig  id="configTinyMCE" ';
         echo 'data-lang="' . $t_config['lang'] . '" ';
         echo 'data-plugins="' . $t_config['plugins'] . '" ';
@@ -249,6 +255,12 @@ class VEditorPlugin extends MantisFormattingPlugin {
         echo 'data-pasteimages="' . $t_config['pasteimages'] . '" ';
         echo 'data-pastetext="' . $t_config['pastetext'] . '" ';
         echo 'data-dark="' . config_get('plugin_MantisBTModernDarkTheme_enabled', 0) . '" ';
+
+        echo 'data-toolbar_mode="' . plugin_config_get('toolbar_mode', 'sliding') . '" ';
+        echo 'data-statusbar="' . (plugin_config_get('statusbar', false) ? 'true' : 'false') . '" ';
+        echo 'data-resize="' . (plugin_config_get('resize', true) ? 'true' : 'false') . '" ';
+        echo 'data-branding="' . (plugin_config_get('branding', false) ? 'true' : 'false') . '" ';
+        echo 'data-promotion="' . (plugin_config_get('promotion', false) ? 'true' : 'false') . '" ';
 
         echo '</wyswig>>';
         echo '<script src="' . plugin_file('js/VEditor.js') . '&KEY=' . md5(filemtime(plugin_file_path('js/VEditor.js', plugin_get_current()))) . '" referrerpolicy="origin"></script>';
@@ -302,7 +314,7 @@ class VEditorPlugin extends MantisFormattingPlugin {
             'process_urls' => ON,
             'process_buglinks' => ON,
             'process_markdown' => OFF,
-            'language_mapping' => ['english' => 'en', 'french' => 'fr_FR', 'german' => 'de', 'polish' => 'pl', 'spanish' => 'es_419'],
+            'language_mapping' => ['italian' => 'it', 'english' => 'en', 'french' => 'fr_FR', 'german' => 'de', 'polish' => 'pl', 'spanish' => 'es_419'],
             'pages' => ['bugnote_edit_page.php', 'view.php', 'bug_update_page.php', 'bug_report_page.php', 'bug_change_status_page.php'],
             'access_level' => REPORTER,
             'dev_level' => DEVELOPER,
@@ -315,7 +327,13 @@ class VEditorPlugin extends MantisFormattingPlugin {
             'pasteimages' => 'true',
             'pastetext' => 'true',
             'conv_img_to_file' => 1,
-            'html_disable_str' => ''
+            'html_disable_str' => '',
+            'statusbar' => false,
+            'resize' => true,
+            'toolbar_mode' => 'sliding',
+            'branding' => false,
+            'promotion' => false,
+            'show_menubar' => true,
         ];
     }
 
@@ -528,6 +546,9 @@ class VEditorPlugin extends MantisFormattingPlugin {
         return $t_string;
     }
 
+    function config_page() {
+        return 'config';
+    }
 }
 
 /*
@@ -540,7 +561,7 @@ function veditor_bug_get_attachments($p_bug_id) {
 		                FROM {bug_file}
 		                WHERE bug_id=' . db_param();
 
-#if bug is not moving to another project, disable TinyMCE attachments    
+#if bug is not moving to another project, disable TinyMCE attachments
     if (strpos($_SERVER['PHP_SELF'], 'bug_actiongroup.php') === false) {
         $t_query .= " AND title <> '" . IMG_PREFIX . "' ";
     }
